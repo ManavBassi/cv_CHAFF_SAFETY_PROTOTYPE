@@ -1,0 +1,10 @@
+# CV Chaff Safety Prototype — Pinned Dependencies
+# Python 3.10 or 3.11 required (MediaPipe constraint)
+# Install: pip install -r requirements.txt
+
+opencv-python==4.10.0.84
+mediapipe==0.10.14
+numpy==1.26.4
+pyyaml==6.0.2
+pytest==8.3.3
+pytest-cov==5.0.0

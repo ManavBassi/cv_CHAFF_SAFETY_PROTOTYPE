@@ -1,0 +1,54 @@
+# CV Chaff Safety Prototype — Configuration
+# All machine-control outputs are SIMULATED. No physical actuation is enabled.
+
+camera:
+  device_index: 0          # USB camera index (0 = default, try 1, 2 if camera not found)
+  width: 1280
+  height: 720
+  fps: 30
+  freeze_timeout_s: 2.0    # Seconds of no new frame before FAULT is declared
+
+detection:
+  model: mediapipe          # Options: mediapipe | yolo
+  mediapipe:
+    max_num_hands: 2
+    min_detection_confidence: 0.6
+    min_tracking_confidence: 0.5
+    model_complexity: 0     # 0=lite (fastest), 1=full
+  yolo:
+    weights: yolov8n.pt     # Fallback if mediapipe unavailable
+    confidence_threshold: 0.45
+  missed_frames_warning: 5    # Consecutive missed detections before WARNING state
+  missed_frames_fault: 15     # Consecutive missed detections before FAULT state
+
+danger_zone:
+  # Polygon corners in NORMALISED coordinates [0.0–1.0] relative to frame size
+  # x=0 is left, y=0 is top. Adjust after calibration (see scripts/calibrate_zone.py)
+  # Default: right-side rectangle simulating feed-roller area
+  polygon:
+    - [0.60, 0.20]
+    - [1.00, 0.20]
+    - [1.00, 0.80]
+    - [0.60, 0.80]
+  warning_distance_px: 120    # Distance (pixels) at which WARNING is triggered
+  action_distance_px: 40      # Distance (pixels) at which PROTECTIVE_ACTION is triggered
+
+predictor:
+  velocity_window: 6          # Number of frames used for velocity estimation
+  approach_speed_threshold_px_s: 80   # px/s; below this, no approach assumed
+  clear_hold_frames: 10       # Frames of no approach before reverting to CLEAR
+
+output:
+  # All outputs are SIMULATED — no GPIO, serial, or machine interface
+  simulated_mode: true        # MUST remain true until machine professionally validated
+  visual_warning_color: [0, 215, 255]       # BGR: amber
+  visual_action_color: [0, 0, 220]          # BGR: red
+  visual_fault_color: [180, 0, 180]         # BGR: magenta
+  audio_beep: true                          # System bell on WARNING/ACTION
+
+logging:
+  log_dir: logs
+  event_log_file: events.jsonl              # One JSON object per line
+  latency_log_file: latency.csv
+  max_log_size_mb: 50
+  log_level: INFO
